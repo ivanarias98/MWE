@@ -137,14 +137,6 @@
             letter-spacing: 0.5px;
         }
 
-        .stimulus-categoria {
-            font-size: 11px;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-top: 15px;
-        }
-
         .buttons-container {
             display: flex;
             gap: 100px;
@@ -412,6 +404,7 @@
     <div class="container">
         <div class="header">
             <h1>Clasificación de unidades multipalabra</h1>
+            <p>Evaluación empírica basada en mouse-tracking</p>
         </div>
 
         <div class="main-content">
@@ -440,7 +433,6 @@
                     frente a un compuesto composicional)
                 </div>
                 <div class="stimulus-text" id="stimulusText">Cargando estímulo...</div>
-                <div class="stimulus-categoria" id="stimCategory">--</div>
             </div>
 
             <div class="buttons-container">
@@ -513,7 +505,11 @@
                 <strong>📥 Datos guardados:</strong><br>
                 ✓ Archivo JSON descargado<br>
                 ✓ Copia de seguridad en navegador<br>
-                ✓ Listo para análisis
+                ✓ Listo para análisis<br>
+                <br>
+                <strong>✨ Estructura:</strong><br>
+                Sin clasificación predefinida<br>
+                100% empírico
             </div>
             <div class="modal-buttons" style="margin-top: 20px;">
                 <button class="btn-modal" onclick="downloadData()">Descargar de nuevo</button>
@@ -523,28 +519,29 @@
     </div>
 
     <script>
-        // ====== ESTÍMULOS: UNIDADES MULTIPALABRA ======
+        // ====== ESTÍMULOS: SOLO STRINGS, SIN CATEGORÍA ======
+        // IMPORTANTE: Solo texto, sin objetos, sin category
         const stimuli = [
-            { text: 'fuerza laboral', category: 'Multipalabra común' },
-            { text: 'juicio de valor', category: 'Multipalabra común' },
-            { text: 'ama de casa', category: 'Multipalabra común' },
-            { text: 'mercado laboral', category: 'Multipalabra común' },
-            { text: 'teoría de la propiedad', category: 'Multipalabra compleja' },
-            { text: 'medio ambiente', category: 'Multipalabra común' },
-            { text: 'plan de estudios', category: 'Multipalabra común' },
-            { text: 'ingeniero informático', category: 'Composicional' },
-            { text: 'clase de refuerzo', category: 'Composicional' },
-            { text: 'círculo vicioso', category: 'Multipalabra común' },
-            { text: 'escuela media', category: 'Composicional' },
-            { text: 'escuela primaria', category: 'Composicional' },
-            { text: 'relaciones públicas', category: 'Multipalabra común' },
-            { text: 'efecto placebo', category: 'Multipalabra común' },
-            { text: 'grupo de control', category: 'Composicional' },
-            { text: 'ensayo clínico', category: 'Composicional' },
-            { text: 'salón de clases', category: 'Composicional' },
-            { text: 'sistemas de detección', category: 'Composicional' },
-            { text: 'correo electrónico', category: 'Multipalabra común' },
-            { text: 'mensaje clave', category: 'Composicional' }
+            'fuerza laboral',
+            'juicio de valor',
+            'ama de casa',
+            'mercado laboral',
+            'teoría de la propiedad',
+            'medio ambiente',
+            'plan de estudios',
+            'ingeniero informático',
+            'clase de refuerzo',
+            'círculo vicioso',
+            'escuela media',
+            'escuela primaria',
+            'relaciones públicas',
+            'efecto placebo',
+            'grupo de control',
+            'ensayo clínico',
+            'salón de clases',
+            'sistemas de detección',
+            'correo electrónico',
+            'mensaje clave'
         ];
 
         // ====== LÓGICA DEL EXPERIMENTO ======
@@ -612,14 +609,14 @@
                 return;
             }
 
+            // IMPORTANTE: currentStimulus es ahora un STRING, no un objeto
             state.currentStimulus = stimuli[state.currentTrial];
             state.currentTrial += 1;
             state.isTracking = false;
             state.currentTrajectory = [];
 
             document.getElementById('trialNum').textContent = state.currentTrial;
-            document.getElementById('stimCategory').textContent = state.currentStimulus.category;
-            document.getElementById('stimulusText').textContent = state.currentStimulus.text;
+            document.getElementById('stimulusText').textContent = state.currentStimulus;
             document.getElementById('btnStart').disabled = false;
             document.getElementById('btnSi').disabled = true;
             document.getElementById('btnNo').disabled = true;
@@ -676,10 +673,11 @@
             const rt = state.currentTrajectory.length > 0 ? 
                 state.currentTrajectory[state.currentTrajectory.length - 1].time : 0;
 
+            // IMPORTANTE: NO se guarda category
+            // Solo: trial, stimulus, response, rt, trajectory
             state.data.push({
                 trial: state.currentTrial,
-                stimulus: state.currentStimulus.text,
-                category: state.currentStimulus.category,
+                stimulus: state.currentStimulus,
                 response: response,
                 rt: rt,
                 trajectory: state.currentTrajectory
