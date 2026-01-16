@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Experimento: Unidades Multipalabra - Mouse Tracking</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #0a0e27;
+        }
+
+        .header {
+            padding: 20px;
+            text-align: center;
+            background: rgba(15, 23, 42, 0.95);
+            border-bottom: 3px solid #06b6d4;
+        }
+
+        .header h1 {
+            font-size: 26px;
+            margin-bottom: 5px;
+            color: #06b6d4;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .status-bar {
+            position: absolute;
+            top: 100px;
+            right: 20px;
+            background: rgba(30, 41, 59, 0.9);
+            border: 2px solid #10b981;
+            border-radius: 8px;
+            padding: 12px 15px;
+            font-size: 12px;
+            min-width: 200px;
+        }
+
+        .trial-info {
+            position: absolute;
+            top: 100px;
+            left: 20px;
+            background: rgba(30, 41, 59, 0.9);
+            border: 2px solid #06b6d4;
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 12px;
+            min-width: 200px;
+        }
+
+        .trial-info div {
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .trial-label {
+            color: #94a3b8;
+        }
+
+        .trial-value {
+            color: #06b6d4;
+            font-weight: bold;
+            font-family: monospace;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        .stimulus-box {
+            background: rgba(30, 41, 59, 0.95);
+            border: 3px solid #06b6d4;
+            border-radius: 15px;
+            padding: 40px;
+            max-width: 700px;
+            text-align: center;
+            margin-bottom: 50px;
+            z-index: 5;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(6, 182, 212, 0.2);
+        }
+
+        .pregunta-header {
+            font-size: 13px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .stimulus-text {
+            font-size: 28px;
+            color: #e2e8f0;
+            font-weight: bold;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        .stimulus-categoria {
+            font-size: 11px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-top: 15px;
+        }
+
+        .buttons-container {
+            display: flex;
+            gap: 100px;
+            margin-bottom: 30px;
+            z-index: 10;
+            justify-content: center;
+        }
+
+        .btn-response {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: 4px solid transparent;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            flex-direction: column;
+        }
+
+        .btn-response:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-si {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-color: #10b981;
+            color: white;
+        }
+
+        .btn-si:hover:not(:disabled) {
+            transform: scale(1.15);
+            box-shadow: 0 12px 35px rgba(16, 185, 129, 0.6);
+        }
+
+        .btn-no {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            border-color: #ef4444;
+            color: white;
+        }
+
+        .btn-no:hover:not(:disabled) {
+            transform: scale(1.15);
+            box-shadow: 0 12px 35px rgba(239, 68, 68, 0.6);
+        }
+
+        .btn-label {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .btn-start {
+            position: absolute;
+            bottom: 30px;
+            padding: 14px 35px;
+            background: #06b6d4;
+            border: none;
+            border-radius: 30px;
+            color: #0f172a;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .btn-start:hover:not(:disabled) {
+            transform: scale(1.08);
+            box-shadow: 0 10px 25px rgba(6, 182, 212, 0.6);
+        }
+
+        .btn-start:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .modal.hidden {
+            display: none;
+        }
+
+        .modal-content {
+            background: #0f172a;
+            border: 3px solid #06b6d4;
+            border-radius: 15px;
+            padding: 45px;
+            max-width: 550px;
+            text-align: center;
+        }
+
+        .modal-content h2 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            color: #06b6d4;
+        }
+
+        .modal-content p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+            color: #e2e8f0;
+            font-size: 15px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn-modal {
+            padding: 12px 25px;
+            border: 2px solid #06b6d4;
+            background: transparent;
+            color: #06b6d4;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            font-size: 13px;
+        }
+
+        .btn-modal.primary {
+            background: #06b6d4;
+            color: #0f172a;
+        }
+
+        .results-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .results-modal.show {
+            display: flex;
+        }
+
+        .results-box {
+            background: #0f172a;
+            border: 3px solid #06b6d4;
+            border-radius: 15px;
+            padding: 40px;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .results-box h2 {
+            font-size: 24px;
+            margin-bottom: 25px;
+            color: #06b6d4;
+        }
+
+        .result-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(6, 182, 212, 0.1);
+            border-left: 4px solid #06b6d4;
+            border-radius: 6px;
+        }
+
+        .result-label {
+            font-size: 11px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .result-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #06b6d4;
+            font-family: monospace;
+        }
+
+        .summary-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .summary-modal.show {
+            display: flex;
+        }
+
+        .summary-box {
+            background: #0f172a;
+            border: 3px solid #10b981;
+            border-radius: 15px;
+            padding: 40px;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .summary-box h2 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #10b981;
+        }
+
+        .file-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(59, 130, 246, 0.1);
+            border: 2px solid #3b82f6;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #93c5fd;
+            line-height: 1.8;
+        }
+
+        .summary-stat {
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid #10b981;
+            border-radius: 6px;
+        }
+
+        .summary-stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #10b981;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🖱️ Evaluación de Unidades Multipalabra</h1>
+            <p>Experimento de seguimiento del ratón - Análisis psicolingüístico</p>
+        </div>
+
+        <div class="main-content">
+            <canvas id="trailCanvas"></canvas>
+
+            <div class="status-bar">
+                <div style="color: #10b981; font-weight: bold;">✅ Guardado automático</div>
+                <div id="saveStatus" style="color: #10b981; margin-top: 5px;">Listo</div>
+            </div>
+
+            <div class="trial-info">
+                <div>
+                    <span class="trial-label">Ensayo:</span>
+                    <span class="trial-value"><span id="trialNum">1</span>/20</span>
+                </div>
+                <div>
+                    <span class="trial-label">Tiempo:</span>
+                    <span class="trial-value" id="timeInfo">0 ms</span>
+                </div>
+            </div>
+
+            <div class="stimulus-box">
+                <div class="pregunta-header">
+                    ¿Funciona de la siguiente forma como unidad multipalabra?<br>
+                    (Un conjunto de dos o más palabras que remiten a un significado unitario,<br>
+                    frente a un compuesto composicional)
+                </div>
+                <div class="stimulus-text" id="stimulusText">Cargando estímulo...</div>
+                <div class="stimulus-categoria" id="stimCategory">--</div>
+            </div>
+
+            <div class="buttons-container">
+                <button class="btn-response btn-si" id="btnSi" disabled>
+                    <span class="btn-label">SÍ</span>
+                    <span style="font-size: 12px;">(Multipalabra)</span>
+                </button>
+                <button class="btn-response btn-no" id="btnNo" disabled>
+                    <span class="btn-label">NO</span>
+                    <span style="font-size: 12px;">(Composicional)</span>
+                </button>
+            </div>
+
+            <button class="btn-start" id="btnStart">INICIAR ENSAYO</button>
+        </div>
+    </div>
+
+    <div class="modal" id="instructionsModal">
+        <div class="modal-content">
+            <h2>Instrucciones</h2>
+            <p>
+                En este experimento evaluarás si diferentes expresiones funcionan como <strong>unidades multipalabra</strong> 
+                (con significado unitario) o como <strong>compuestos composicionales</strong> (suma de partes).
+            </p>
+            <p>
+                Para cada expresión, debes indicar:
+            </p>
+            <p>
+                <strong>SÍ:</strong> Si crees que funciona como una unidad con significado único<br>
+                <strong>NO:</strong> Si crees que su significado es la suma de las palabras
+            </p>
+            <p style="color: #94a3b8; margin-top: 15px; font-size: 13px;">
+                ℹ️ Los datos se guardan automáticamente en tu navegador
+            </p>
+            <div class="modal-buttons">
+                <button class="btn-modal primary" onclick="startExperiment()">Comenzar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="results-modal" id="resultsModal">
+        <div class="results-box">
+            <h2>Resultado</h2>
+            <div class="result-item">
+                <div class="result-label">Tu respuesta</div>
+                <div class="result-value" id="resultResponse">--</div>
+            </div>
+            <div class="result-item">
+                <div class="result-label">Tiempo (ms)</div>
+                <div class="result-value" id="resultRT">--</div>
+            </div>
+            <div class="modal-buttons" style="margin-top: 20px;">
+                <button class="btn-modal primary" onclick="nextTrial()">Siguiente</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="summary-modal" id="summaryModal">
+        <div class="summary-box">
+            <h2>✅ ¡Experimento completado!</h2>
+            <div class="summary-stat">
+                <strong>Ensayos completados:</strong>
+                <div class="summary-stat-value" id="summaryTotal">20/20</div>
+            </div>
+            <div class="summary-stat">
+                <strong>Tiempo promedio:</strong>
+                <div class="summary-stat-value" id="summaryRT">1200 ms</div>
+            </div>
+            <div class="file-info">
+                <strong>📥 Datos guardados:</strong><br>
+                ✓ Archivo JSON descargado<br>
+                ✓ Copia de seguridad en navegador<br>
+                ✓ Listo para análisis
+            </div>
+            <div class="modal-buttons" style="margin-top: 20px;">
+                <button class="btn-modal" onclick="downloadData()">Descargar de nuevo</button>
+                <button class="btn-modal primary" onclick="location.reload()">Reiniciar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ====== ESTÍMULOS: UNIDADES MULTIPALABRA ======
+        const stimuli = [
+            { text: 'fuerza laboral', category: 'Multipalabra común' },
+            { text: 'juicio de valor', category: 'Multipalabra común' },
+            { text: 'ama de casa', category: 'Multipalabra común' },
+            { text: 'mercado laboral', category: 'Multipalabra común' },
+            { text: 'teoría de la propiedad', category: 'Multipalabra compleja' },
+            { text: 'medio ambiente', category: 'Multipalabra común' },
+            { text: 'plan de estudios', category: 'Multipalabra común' },
+            { text: 'ingeniero informático', category: 'Composicional' },
+            { text: 'clase de refuerzo', category: 'Composicional' },
+            { text: 'círculo vicioso', category: 'Multipalabra común' },
+            { text: 'escuela media', category: 'Composicional' },
+            { text: 'escuela primaria', category: 'Composicional' },
+            { text: 'relaciones públicas', category: 'Multipalabra común' },
+            { text: 'efecto placebo', category: 'Multipalabra común' },
+            { text: 'grupo de control', category: 'Composicional' },
+            { text: 'ensayo clínico', category: 'Composicional' },
+            { text: 'salón de clases', category: 'Composicional' },
+            { text: 'sistemas de detección', category: 'Composicional' },
+            { text: 'correo electrónico', category: 'Multipalabra común' },
+            { text: 'mensaje clave', category: 'Composicional' }
+        ];
+
+        // ====== LÓGICA DEL EXPERIMENTO ======
+        const state = {
+            currentTrial: 0,
+            isTracking: false,
+            startTime: null,
+            currentTrajectory: [],
+            data: [],
+            currentStimulus: null
+        };
+
+        const canvas = document.getElementById('trailCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        function downloadJSON(filename, data) {
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        function downloadData() {
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            downloadJSON(`datos_multipalabras_${timestamp}.json`, state.data);
+        }
+
+        function saveToStorage() {
+            try {
+                localStorage.setItem('multipalabrasData', JSON.stringify(state.data));
+                localStorage.setItem('dataTimestamp', new Date().toISOString());
+                document.getElementById('saveStatus').textContent = '✅ Guardado';
+                setTimeout(() => {
+                    document.getElementById('saveStatus').textContent = 'Listo';
+                }, 1000);
+                return true;
+            } catch (e) {
+                console.error('Error de almacenamiento:', e);
+                return false;
+            }
+        }
+
+        function startExperiment() {
+            document.getElementById('instructionsModal').classList.add('hidden');
+            initTrial();
+        }
+
+        function initTrial() {
+            if (state.currentTrial >= stimuli.length) {
+                showFinalResults();
+                return;
+            }
+
+            state.currentStimulus = stimuli[state.currentTrial];
+            state.currentTrial += 1;
+            state.isTracking = false;
+            state.currentTrajectory = [];
+
+            document.getElementById('trialNum').textContent = state.currentTrial;
+            document.getElementById('stimCategory').textContent = state.currentStimulus.category;
+            document.getElementById('stimulusText').textContent = state.currentStimulus.text;
+            document.getElementById('btnStart').disabled = false;
+            document.getElementById('btnSi').disabled = true;
+            document.getElementById('btnNo').disabled = true;
+            document.getElementById('resultsModal').classList.remove('show');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        document.getElementById('btnStart').addEventListener('click', function() {
+            state.isTracking = true;
+            state.startTime = Date.now();
+            state.currentTrajectory = [];
+            this.disabled = true;
+            document.getElementById('btnSi').disabled = false;
+            document.getElementById('btnNo').disabled = false;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        });
+
+        document.addEventListener('mousemove', function(e) {
+            if (!state.isTracking) return;
+
+            const elapsed = Date.now() - state.startTime;
+            state.currentTrajectory.push({
+                x: e.clientX,
+                y: e.clientY,
+                time: elapsed
+            });
+
+            document.getElementById('timeInfo').textContent = elapsed + ' ms';
+
+            ctx.strokeStyle = 'rgba(6, 182, 212, 0.7)';
+            ctx.lineWidth = 2.5;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+
+            if (state.currentTrajectory.length > 1) {
+                const prev = state.currentTrajectory[state.currentTrajectory.length - 2];
+                ctx.beginPath();
+                ctx.moveTo(prev.x, prev.y);
+                ctx.lineTo(e.clientX, e.clientY);
+                ctx.stroke();
+            }
+        });
+
+        document.getElementById('btnSi').addEventListener('click', function() {
+            if (state.isTracking) endTrial('SÍ (Multipalabra)');
+        });
+
+        document.getElementById('btnNo').addEventListener('click', function() {
+            if (state.isTracking) endTrial('NO (Composicional)');
+        });
+
+        function endTrial(response) {
+            state.isTracking = false;
+            const rt = state.currentTrajectory.length > 0 ? 
+                state.currentTrajectory[state.currentTrajectory.length - 1].time : 0;
+
+            state.data.push({
+                trial: state.currentTrial,
+                stimulus: state.currentStimulus.text,
+                category: state.currentStimulus.category,
+                response: response,
+                rt: rt,
+                trajectory: state.currentTrajectory
+            });
+
+            saveToStorage();
+
+            document.getElementById('resultResponse').textContent = response;
+            document.getElementById('resultRT').textContent = rt;
+            document.getElementById('resultsModal').classList.add('show');
+
+            document.getElementById('btnSi').disabled = true;
+            document.getElementById('btnNo').disabled = true;
+        }
+
+        function nextTrial() {
+            initTrial();
+        }
+
+        function showFinalResults() {
+            const avgRT = (state.data.reduce((sum, d) => sum + d.rt, 0) / state.data.length).toFixed(0);
+
+            saveToStorage();
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            downloadJSON(`datos_multipalabras_${timestamp}.json`, state.data);
+
+            document.getElementById('summaryTotal').textContent = state.currentTrial + '/' + stimuli.length;
+            document.getElementById('summaryRT').textContent = avgRT + ' ms';
+            document.getElementById('summaryModal').classList.add('show');
+
+            window.experimentData = state.data;
+            console.log('Datos del experimento:', state.data);
+        }
+
+        window.addEventListener('load', function() {
+            document.getElementById('instructionsModal').classList.remove('hidden');
+        });
+    </script>
+</body>
+</html>
