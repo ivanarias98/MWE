@@ -120,24 +120,12 @@
             box-shadow: 0 10px 30px rgba(6, 182, 212, 0.2);
         }
 
-        .pregunta-header {
-            font-size: 13px;
-            color: #94a3b8;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 20px;
-            line-height: 1.6;
-        }
-
         .stimulus-text {
-            font-size: 28px;
+            font-size: 32px;
             color: #e2e8f0;
             font-weight: bold;
-            margin-bottom: 20px;
             letter-spacing: 0.5px;
         }
-
-
 
         .buttons-container {
             display: flex;
@@ -256,64 +244,72 @@
             font-size: 13px;
         }
 
+        .btn-modal:hover {
+            background: #06b6d4;
+            color: #0f172a;
+            transform: translateY(-2px);
+        }
+
         .btn-modal.primary {
             background: #06b6d4;
             color: #0f172a;
         }
 
-        .results-modal {
+        .btn-modal.primary:hover {
+            background: #0891b2;
+            border-color: #0891b2;
+        }
+
+        .interstitial-screen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.75);
+            background: rgba(10, 14, 39, 0.98);
             display: none;
             align-items: center;
             justify-content: center;
-            z-index: 100;
+            z-index: 50;
         }
 
-        .results-modal.show {
+        .interstitial-screen.show {
             display: flex;
         }
 
-        .results-box {
-            background: #0f172a;
+        .interstitial-content {
+            background: rgba(30, 41, 59, 0.95);
             border: 3px solid #06b6d4;
             border-radius: 15px;
-            padding: 40px;
-            max-width: 400px;
+            padding: 50px;
             text-align: center;
+            max-width: 500px;
         }
 
-        .results-box h2 {
+        .interstitial-content h2 {
             font-size: 24px;
-            margin-bottom: 25px;
             color: #06b6d4;
+            margin-bottom: 30px;
         }
 
-        .result-item {
-            margin-bottom: 20px;
-            padding: 15px;
-            background: rgba(6, 182, 212, 0.1);
-            border-left: 4px solid #06b6d4;
-            border-radius: 6px;
-        }
-
-        .result-label {
-            font-size: 11px;
-            color: #94a3b8;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 5px;
-        }
-
-        .result-value {
-            font-size: 20px;
+        .btn-start-trial {
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
             font-weight: bold;
-            color: #06b6d4;
-            font-family: monospace;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 8px 20px rgba(6, 182, 212, 0.4);
+        }
+
+        .btn-start-trial:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 30px rgba(6, 182, 212, 0.6);
         }
 
         .summary-modal {
@@ -338,14 +334,43 @@
             border: 3px solid #10b981;
             border-radius: 15px;
             padding: 40px;
-            max-width: 500px;
+            max-width: 600px;
             text-align: center;
         }
 
         .summary-box h2 {
             font-size: 28px;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
             color: #10b981;
+        }
+
+        .thanks-message {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid #10b981;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            line-height: 1.8;
+        }
+
+        .thanks-message p {
+            margin-bottom: 10px;
+            color: #e2e8f0;
+            font-size: 15px;
+        }
+
+        .email-highlight {
+            background: rgba(6, 182, 212, 0.2);
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 2px solid #06b6d4;
+        }
+
+        .email-highlight strong {
+            color: #06b6d4;
+            font-size: 16px;
+            font-family: monospace;
         }
 
         .file-info {
@@ -401,11 +426,6 @@
             </div>
 
             <div class="stimulus-box">
-                <div class="pregunta-header">
-                    ¿Funciona de la siguiente forma como unidad multipalabra?<br>
-                    (Un conjunto de dos o más palabras que remiten a un significado unitario,<br>
-                    frente a un compuesto composicional)
-                </div>
                 <div class="stimulus-text" id="stimulusText">Cargando estímulo...</div>
             </div>
 
@@ -430,8 +450,8 @@
                 (con significado unitario) o como <strong>compuestos composicionales</strong> (suma de partes).
             </p>
             <p>
-                <strong>⚠️ IMPORTANTE:</strong> Cada palabra aparecerá automáticamente. 
-                El experimento registra tus movimientos de ratón desde el inicio.
+                <strong>⚠️ IMPORTANTE:</strong> Antes de cada palabra, deberás pulsar "INICIAR" para comenzar el ensayo. 
+                El experimento registra tus movimientos de ratón desde ese momento.
             </p>
             <p>
                 Para cada expresión, mueve el ratón y haz clic en:
@@ -449,26 +469,22 @@
         </div>
     </div>
 
-    <div class="results-modal" id="resultsModal">
-        <div class="results-box">
-            <h2>Resultado</h2>
-            <div class="result-item">
-                <div class="result-label">Tu respuesta</div>
-                <div class="result-value" id="resultResponse">--</div>
-            </div>
-            <div class="result-item">
-                <div class="result-label">Tiempo (ms)</div>
-                <div class="result-value" id="resultRT">--</div>
-            </div>
-            <div class="modal-buttons" style="margin-top: 20px;">
-                <button class="btn-modal primary" onclick="nextTrial()">Siguiente</button>
-            </div>
+    <div class="interstitial-screen" id="interstitialScreen">
+        <div class="interstitial-content">
+            <h2>Prepárate para el siguiente ensayo</h2>
+            <button class="btn-start-trial" onclick="startTrial()">INICIAR</button>
         </div>
     </div>
 
     <div class="summary-modal" id="summaryModal">
         <div class="summary-box">
             <h2>✅ ¡Experimento completado!</h2>
+            
+            <div class="thanks-message">
+                <p><strong>¡Muchas gracias por tu participación en este estudio!</strong></p>
+                <p>Tu colaboración es muy valiosa para nuestra investigación sobre unidades multipalabra.</p>
+            </div>
+
             <div class="summary-stat">
                 <strong>Ensayos completados:</strong>
                 <div class="summary-stat-value" id="summaryTotal">20/20</div>
@@ -477,12 +493,20 @@
                 <strong>Tiempo promedio:</strong>
                 <div class="summary-stat-value" id="summaryRT">1200 ms</div>
             </div>
+            
             <div class="file-info">
                 <strong>📥 Datos guardados:</strong><br>
-                ✓ Archivo JSON descargado<br>
+                ✓ Archivo JSON descargado automáticamente<br>
                 ✓ Copia de seguridad en navegador<br>
-                ✓ Listo para análisis
             </div>
+
+            <div class="email-highlight">
+                <p style="margin-bottom: 8px; color: #94a3b8; font-size: 13px;">
+                    Por favor, envía el archivo JSON descargado a:
+                </p>
+                <strong>ivanarias.arias@usc.gal</strong>
+            </div>
+
             <div class="modal-buttons" style="margin-top: 20px;">
                 <button class="btn-modal" onclick="downloadData()">Descargar de nuevo</button>
                 <button class="btn-modal primary" onclick="location.reload()">Reiniciar</button>
@@ -571,10 +595,10 @@
 
         function startExperiment() {
             document.getElementById('instructionsModal').classList.add('hidden');
-            initTrial();
+            showInterstitial();
         }
 
-        function initTrial() {
+        function showInterstitial() {
             if (state.currentTrial >= stimuli.length) {
                 showFinalResults();
                 return;
@@ -582,14 +606,19 @@
 
             state.currentStimulus = stimuli[state.currentTrial];
             state.currentTrial += 1;
-            state.isTracking = false;
-            state.currentTrajectory = [];
 
             document.getElementById('trialNum').textContent = state.currentTrial;
             document.getElementById('stimulusText').textContent = state.currentStimulus;
+            document.getElementById('interstitialScreen').classList.add('show');
+        }
+
+        function startTrial() {
+            document.getElementById('interstitialScreen').classList.remove('show');
+            
+            state.isTracking = false;
+            state.currentTrajectory = [];
             document.getElementById('btnSi').disabled = true;
             document.getElementById('btnNo').disabled = true;
-            document.getElementById('resultsModal').classList.remove('show');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             // INICIA TRACKING AUTOMÁTICAMENTE DESPUÉS DE 500ms
@@ -657,17 +686,12 @@
 
             saveToStorage();
 
-            document.getElementById('resultResponse').textContent = response;
-            document.getElementById('resultRT').textContent = rt;
-            document.getElementById('resultsModal').classList.add('show');
-
             document.getElementById('btnSi').disabled = true;
             document.getElementById('btnNo').disabled = true;
-        }
 
-        function nextTrial() {
+            // Pasar al siguiente ensayo
             setTimeout(function() {
-                initTrial();
+                showInterstitial();
             }, 300);
         }
 
